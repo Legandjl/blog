@@ -18,7 +18,7 @@ exports.login = async (req, res) => {
       if (err) {
         res.send(err);
       }
-      const token = jwt.sign(user.toJSON(), "secret", { expiresIn: "1000s" });
+      const token = jwt.sign(user.toJSON(), "secret", { expiresIn: "10000s" });
       return res.json({ user, token });
     });
   })(req, res);
@@ -29,6 +29,7 @@ exports.signup = async (req, res) => {
     const users = await User.find({});
     if (users.length > 0) {
       throw new Error("Admin Already Exists");
+      // throw if user already exists
     }
     const hashPassword = await bcrypt.hash(req.body.password, 10);
     const user = new User({

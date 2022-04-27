@@ -8,23 +8,13 @@ exports.get_all_published_blog_posts = async (req, res) => {
       .where("published")
       .equals(true)
       .sort({ date: -1 });
+
     res.status(200).json(blog_data);
   } catch (e) {
     return res.status(400).json({ error: e.message });
   }
 };
-//GET all published blog posts
-exports.get_all_unpublished_blog_posts = async (req, res) => {
-  try {
-    const blog_data = await Post.find()
-      .where("published")
-      .equals(false)
-      .sort({ date: -1 });
-    res.status(200).json(blog_data);
-  } catch (e) {
-    return res.status(400).json({ error: e.message });
-  }
-};
+
 //GET a specific post by ID
 exports.get_blog_post_by_id = async (req, res) => {
   //get comment data and blog post data and send back together
@@ -44,6 +34,7 @@ exports.get_blog_post_by_id = async (req, res) => {
 };
 //POST comment to a blog post
 exports.post_comment_blog_post = async (req, res) => {
+  console.log(req.body);
   try {
     const blog_post = await Post.findById(req.params.id).exec();
     const comment = new Comment({
@@ -66,7 +57,10 @@ exports.get_comments_blog_post = async (req, res) => {
     const comments = await Comment.find()
       .where("post")
       .equals(req.params.id)
-      .sort({ date: -1 });
+      .sort({ date: 1 })
+      .skip(req.params.skip)
+      .limit(5);
+
     res.send(comments);
   } catch (e) {
     res.send(e);
