@@ -39,13 +39,17 @@ passport.use(
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-      secretOrKey: "secret",
+      secretOrKey: "secret", //need to update to a proper key TODO
     },
     async (jwtPayload, cb) => {
+      console.log(jwtPayload);
       try {
         const user = await User.findById(jwtPayload._id);
         if (user) {
-          return cb(null, user);
+          const name = user.name;
+          const iat = jwtPayload.iat;
+          const rv = { name, iat }; //return value
+          return cb(null, rv);
         } else {
           throw new Error("user not found");
         }

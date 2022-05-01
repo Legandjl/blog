@@ -30,11 +30,16 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 
 app.use("/blog", blogRouter);
+
+/*
 app.use(
   "/admin",
   passport.authenticate("jwt", { session: false }),
   adminRouter
-);
+); */
+
+app.use("/admin", adminRouter);
+
 app.use("/auth", authRouter);
 
 module.exports = app;
