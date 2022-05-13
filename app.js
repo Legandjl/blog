@@ -16,7 +16,7 @@ require("dotenv").config();
 //Set up mongoose connection
 const mongoose = require("mongoose");
 
-const mongoDB = process.env.DB;
+const mongoDB = process.env.DB || process.env.MONGODB_URI;
 
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
@@ -31,14 +31,11 @@ app.use(cors());
 
 app.use("/blog", blogRouter);
 
-/*
 app.use(
   "/admin",
   passport.authenticate("jwt", { session: false }),
   adminRouter
-); */
-
-app.use("/admin", adminRouter);
+);
 
 app.use("/auth", authRouter);
 

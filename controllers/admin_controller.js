@@ -1,13 +1,17 @@
 const { body, validationResult } = require("express-validator");
 const Post = require("../models/post");
 const Comment = require("../models/comment");
-//GET all published blog posts
-exports.get_all_unpublished_blog_posts = async (req, res) => {
+
+// GET all blog posts (published or unpublished)
+exports.get_all_blog_posts = async (req, res) => {
   try {
     const blog_data = await Post.find()
       .where("published")
-      .equals(false)
-      .sort({ date: -1 });
+      .equals(req.query.published)
+      .sort({ date: -1 })
+      .skip(req.params.skip)
+      .limit(10);
+
     res.status(200).json(blog_data);
   } catch (e) {
     return res.status(400).json({ error: e.message });
@@ -15,13 +19,10 @@ exports.get_all_unpublished_blog_posts = async (req, res) => {
 };
 
 // ADD NEW BLOG POST
-
 exports.post_new_blog_post = [
   body("title", "Title must be specified").trim().isLength({ min: 1 }).escape(),
   body("content", "content must be specified").isLength({ min: 1 }).trim(),
   async (req, res) => {
-    console.log(req.body);
-    console.log("posting");
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
@@ -31,6 +32,7 @@ exports.post_new_blog_post = [
           title: req.body.title,
           content: req.body.content,
           published: req.body.published,
+          date: Date.now(),
         });
         await post.save();
         res.status(200).json({
@@ -43,8 +45,36 @@ exports.post_new_blog_post = [
   },
 ];
 
+// UPDATE BLOG POST
+exports.update_blog_post = [
+  body("title", "Title must be specified").trim().isLength({ min: 1 }).escape(),
+  body("content", "content must be specified").isLength({ min: 1 }).trim(),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+    } else {
+      try {
+        const post = new Post({
+          title: req.body.title,
+          content: req.body.content,
+          published: req.body.published,
+          date: req.body.date,
+          _id: req.params.id,
+        });
+        await Post.findByIdAndUpdate(req.params.id, post);
+        res.status(200).json({
+          post_id: post._id,
+        });
+      } catch (e) {
+        return res.status(500).json({ error: e.message });
+      }
+    }
+  },
+];
+
 // DELETE BLOG POST BY ID
-exports.post_delete = async (req, res, next) => {
+exports.post_delete = async (req, res) => {
   try {
     await Post.findByIdAndRemove(req.params.id);
     return res
@@ -57,7 +87,7 @@ exports.post_delete = async (req, res, next) => {
 
 // DELETE COMMENT BY ID
 
-exports.comment_delete = async (req, res, next) => {
+exports.comment_delete = async (req, res) => {
   try {
     await Comment.findByIdAndRemove(req.params.id);
     return res
@@ -68,6 +98,15 @@ exports.comment_delete = async (req, res, next) => {
   }
 };
 
-// UPDATE BLOG POST
-
 //PUBLISH/UNPUBLISH A BLOG POST
+exports.publish_unpublish = async (req, res) => {
+  console.log(req.query.published);
+  try {
+    await Post.findByIdAndUpdate(req.params.id, {
+      published: req.query.published,
+    });
+    res.status(200).json({ message: "Post updated" });
+  } catch (e) {
+    return res.status(400).json({ error: "Post could not be updated" });
+  }
+};

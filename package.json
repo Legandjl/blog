@@ -7,6 +7,9 @@
     "devstart": "nodemon ./bin/www",
     "serverstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart"
   },
+  "engines": {
+    "node": "14.17.6"
+  },
   "dependencies": {
     "async": "^3.2.3",
     "bcrypt": "^5.0.1",
