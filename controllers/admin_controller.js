@@ -14,7 +14,7 @@ exports.get_all_blog_posts = async (req, res) => {
 
     res.status(200).json(blog_data);
   } catch (e) {
-    return res.status(400).json({ error: e.message });
+    res.status(400).json({ error: e.message });
   }
 };
 
@@ -39,7 +39,7 @@ exports.post_new_blog_post = [
           post_id: post._id,
         });
       } catch (e) {
-        return res.status(500).json({ error: e.message });
+        res.status(500).json({ error: e.message });
       }
     }
   },
@@ -67,7 +67,7 @@ exports.update_blog_post = [
           post_id: post._id,
         });
       } catch (e) {
-        return res.status(500).json({ error: e.message });
+        res.status(500).json({ error: e.message });
       }
     }
   },
@@ -81,7 +81,7 @@ exports.post_delete = async (req, res) => {
       .status(200)
       .json({ message: `Post with ID ${req.params.id} deleted` });
   } catch (e) {
-    return res.status(400).json({ error: "Post could not be removed" });
+    res.status(400).json({ error: "Post could not be removed" });
   }
 };
 
@@ -94,19 +94,18 @@ exports.comment_delete = async (req, res) => {
       .status(200)
       .json({ message: `Comment with ID ${req.params.id} deleted` });
   } catch (e) {
-    return res.status(400).json({ error: "Comment could not be removed" });
+    res.status(400).json({ error: "Comment could not be removed" });
   }
 };
 
 //PUBLISH/UNPUBLISH A BLOG POST
 exports.publish_unpublish = async (req, res) => {
-  console.log(req.query.published);
   try {
     await Post.findByIdAndUpdate(req.params.id, {
       published: req.query.published,
     });
     res.status(200).json({ message: "Post updated" });
   } catch (e) {
-    return res.status(400).json({ error: "Post could not be updated" });
+    res.status(400).json({ error: "Post could not be updated" });
   }
 };

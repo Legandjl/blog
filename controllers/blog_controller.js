@@ -10,7 +10,7 @@ exports.get_post_count = async (req, res) => {
       .equals(req.query.published);
     res.status(200).json(count);
   } catch (e) {
-    return res.status(400).json({ error: e.message });
+    res.status(400).json({ error: e.message });
   }
 };
 
@@ -31,7 +31,6 @@ exports.get_all_published_blog_posts = async (req, res) => {
 
 //GET a specific post by ID
 exports.get_blog_post_by_id = async (req, res) => {
-  console.log("called here");
   //get comment data and blog post data and send back together
   try {
     const [comments, post] = await Promise.all([
@@ -42,10 +41,9 @@ exports.get_blog_post_by_id = async (req, res) => {
         .exec(),
       Post.findById(req.params.id).exec(),
     ]);
-    //todo - if not found return not found status
     res.status(200).json({ comments: comments, post: post });
   } catch (e) {
-    return res.status(400).json({ error: e.message });
+    res.status(404).json({ error: e.message });
   }
 };
 //POST comment to a blog post
@@ -63,7 +61,7 @@ exports.post_comment_blog_post = async (req, res) => {
       post_id: blog_post._id,
     });
   } catch (e) {
-    return res.status(400).json({ error: e.message });
+    res.status(400).json({ error: e.message });
   }
 };
 //GET all comments from a specific blog post
@@ -76,8 +74,8 @@ exports.get_comments_blog_post = async (req, res) => {
       .skip(req.params.skip)
       .limit(5);
 
-    res.send(comments);
+    res.status(200).json(comments);
   } catch (e) {
-    return res.status(400).json({ error: e.message });
+    res.status(400).json({ error: e.message });
   }
 };
