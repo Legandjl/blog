@@ -53,7 +53,7 @@ exports.post_comment_blog_post = async (req, res) => {
     const comment = new Comment({
       name: req.body.name,
       content: req.body.content,
-      post: blog_post,
+      post: blog_post._id,
     });
     await comment.save();
     res.status(200).json({
