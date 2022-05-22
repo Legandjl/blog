@@ -39,10 +39,9 @@ passport.use(
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-      secretOrKey: "secret", //need to update to a proper key TODO
+      secretOrKey: process.env.SECRET_KEY, //need to update to a proper key TODO
     },
     async (jwtPayload, cb) => {
-      console.log(jwtPayload);
       try {
         const user = await User.findById(jwtPayload._id);
         if (user) {

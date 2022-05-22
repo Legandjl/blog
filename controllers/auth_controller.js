@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 //login
 exports.login = async (req, res) => {
   //authenticate using local strategy (check if username/pwd is valid)
@@ -18,7 +19,9 @@ exports.login = async (req, res) => {
       if (err) {
         res.send(err);
       }
-      const token = jwt.sign(user.toJSON(), "secret", { expiresIn: "10000s" });
+      const token = jwt.sign(user.toJSON(), process.env.SECRET_KEY, {
+        expiresIn: "10000s",
+      });
       return res.json({ user, token });
     });
   })(req, res);
