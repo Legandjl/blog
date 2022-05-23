@@ -33,27 +33,37 @@ passport.use(
   })
 );
 
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    console.log(err);
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
 //token strategy (auth)
 
 passport.use(
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.SECRET_KEY, //need to update to a proper key TODO
+      secretOrKey: process.env.SECRET_KEY,
     },
     async (jwtPayload, cb) => {
       try {
         const user = await User.findById(jwtPayload._id);
         if (user) {
-          const name = user.name;
-          const iat = jwtPayload.iat;
-          const rv = { name, iat }; //return value
-          return cb(null, rv);
+          return cb(null, user);
         } else {
-          throw new Error("user not found");
+          return cb(null, false);
         }
       } catch (e) {
-        return cb(e);
+        return cb(e, false);
       }
     }
   )
