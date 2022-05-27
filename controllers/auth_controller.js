@@ -15,15 +15,10 @@ exports.login = async (req, res) => {
       });
     }
     //auth passed so login and generate token for return to client
-    req.login(user, { session: false }, (err) => {
-      if (err) {
-        res.send(err);
-      }
-      const token = jwt.sign(user.toJSON(), process.env.SECRET_KEY, {
-        expiresIn: "10000s",
-      });
-      return res.json({ user, token });
+    const token = jwt.sign(user.toJSON(), process.env.SECRET_KEY, {
+      expiresIn: "10000s",
     });
+    return res.json({ user, token });
   })(req, res);
 };
 //signup
